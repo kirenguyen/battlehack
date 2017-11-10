@@ -66,6 +66,8 @@ class Robot():
 
         if self.loc.y < loc:
             y_dir = 1
+
+
         elif self.loc.x > loc:
             y_dir = -1
 
