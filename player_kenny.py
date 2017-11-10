@@ -59,30 +59,45 @@ class Robot():
         x_dir = 0
         y_dir = 0
 
-        if self.loc.x < loc:
+        if self.loc.x < loc[0]:
             x_dir = 1
-        elif self.loc.x > loc:
+        elif self.loc.x > loc[0]:
             x_dir = -1
 
-        if self.loc.y < loc:
+        if self.loc.y < loc[1]:
             y_dir = 1
-        elif self.loc.x > loc:
+        elif self.loc.x > loc[1]:
             y_dir = -1
 
-        if x_dir != 0 and y_dir != 0:
-            direction = battlecode.Direction(x_dir, y_dir)
-            self.entity.queue_move(direction)
+        if x_dir != 0 or y_dir != 0:
+            direction = battlecode.Direction.from_delta(x_dir, y_dir)
+            print(direction, "x", x_dir, "y", y_dir)
+            print(self.cooldown_time)
+            # print(self.loc)
+            # print(direction, (x_dir, y_dir))
+
+            if self.bot.can_move(direction):
+                self.bot.queue_move(direction)
+            else:
+                no_move = False
+                for direction in battlecode.Direction.directions():
+                    if self.bot.can_move(direction):
+                        no_move = True
+                        self.bot.queue_move(direction)
+                if not no_move:
+                    # print("errrrr")
+                    pass
 
     def attack_loc(self, loc):
 
         # calculate distance from self to target location
-        if self.calc_distance(loc) > 7:
+        if self.calc_distance(loc) >= 7:
             # if it is > 7, move closer, otherwise, begin attack sequence
             self.go_to_loc(loc)
 
         else:
             # attack sequence, first need to get adjacent players
-            near_entities = self.bot.entities_within_euclidean_distance(1)
+            near_entities = [x for x in self.bot.entities_within_euclidean_distance(1)]
             if len(near_entities) != 0:
                 # if there is an adjacent player, throw it, otherwise wait??
                 for entity in near_entities: # entity is entity to be thrown
@@ -91,12 +106,12 @@ class Robot():
                         # pickup the entity
                         self.bot.queue_pickup(entity)
                         # throw entity in direction of loc
-                        throw_dir = self.loc.direction_to(entity.location)
+                        throw_dir = self.loc.direction_to(loc)
                         self.bot.queue_throw(throw_dir)
                         break
 
                 # at end of attack seq, set role to None, job is complete
-                self.role = None
+                self.role = (None, None)
 
             else:
                 # there are no nearby bots, wait for the follower bot to catch up?
@@ -132,6 +147,10 @@ class Robot():
 
         # make sure that there is no cooldown time
         if self.cooldown_time == 0:
+
+            # print(self.role)
+            # print("location", self.loc)
+
 
             if self.role[0] == 'attack':
                 self.attack_loc(self.role[1])
@@ -201,14 +220,15 @@ def assign_roles(d, bot, role):
 
 
 
+
 if __name__ == "__main__":
     # Start a game
-    game = battlecode.Game('testplayer')
+    game = battlecode.Game('I GOT GREENS, BEANS, TOMATOES, POTATOES --- YOU NAME IT!')
 
     start = time.clock()
 
     our_bots = {}
-
+    important_locations = {}
 
     for state in game.turns():
 
@@ -216,15 +236,27 @@ if __name__ == "__main__":
         for entity in state.get_entities(team=state.my_team):
             if entity.id not in our_bots:
                 our_bots[entity.id] = Robot(entity)
+            else:
+                our_bots[entity.id].update_bot(entity)
+
+        # identify locations of towers
+        statue_list = []
+        for enemy in state.get_entities(team=state.other_team):
+            if enemy.is_statue:
+                statue_list.append(enemy)
 
 
         # Your Code will run within this loop
         for entity in state.get_entities(team=state.my_team):
             # This line gets all the bots on your team
 
-            '''
-            target all other robots
-            '''
+            robot_class = our_bots[entity.id]
+
+            if robot_class.return_role()[0] == None:
+
+                robot_class.update_role('attack', statue_list[0].location)
+
+            robot_class.brain()
 
 
             # if(state.turn % 10 == 0):
