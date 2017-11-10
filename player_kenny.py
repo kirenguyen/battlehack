@@ -55,7 +55,7 @@ class Robot():
 
         return ((self.loc.x - loc.x) ** 2 + (self.loc.y - loc.y) ** 2) ** (1 / 2)
 
-    def go_to_loc(self, loc):
+    def go_to_loc(self, loc, entity):
         x_dir = 0
         y_dir = 0
 
@@ -211,6 +211,9 @@ if __name__ == "__main__":
 
 
     for state in game.turns():
+        entity_loc = []
+        for entity in state.get_entities():
+            entity_loc.append(entity.location)
 
         # check all robots exist, else add them into the dictionary our_bots
         for entity in state.get_entities(team=state.my_team):
