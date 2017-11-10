@@ -3,7 +3,7 @@ import time
 import random
 
 #Start a game
-game = battlecode.Game('testplayer')
+game = battlecode.Game('Pusheen')
 
 start = time.clock()
 
@@ -21,22 +21,57 @@ def nearest_glass_state(state, entity):
 
     return nearest_statue
 
+def categorize_entities(state):
+    hedges_loc = []
+    my_lob = []
+    my_glass = []
+    opp_lob = []
+    opp_glass = []
+    for entity in state.get_entities(team=state.my_team):
+        if entity.is_statue:
+            my_glass.append(entity)
+        if entity.is_thrower:
+            my_lob.append(entity)
+
+    for entity in state.get_entities(team=0):
+        if entity.is_hedge:
+            hedges_loc.append(entity.location)
+
+    for entity in state.get_entities(team=state.other_team):
+        if entity.is_statue:
+            opp_glass.append(entity)
+        if entity.is_thrower:
+            opp_lob.append(entity)
+    return [hedges_loc, my_lob, my_glass, opp_lob, opp_glass]
+
 for state in game.turns():
     # Your Code will run within this loop
-    for entity in state.get_entities(team=state.my_team): 
+'''''
+    lists = categorize_entities(state)
+    hedges_loc = lists[0]
+    my_lob = lists[1]
+    my_glass = lists[2]
+    opp_lob = lists[3]
+    opp_glass = lists[4]
+
+'''
+
+
+
+    for entity in state.get_entities(team=state.my_team):
         # This line gets all the bots on your team
 
-        if(state.turn % 100 == 0):
+        if(state.turn % 10 == 0):
             for direction in battlecode.Direction.directions():
                 if entity.can_build(direction):
                     entity.queue_build(direction)
 
         my_location = entity.location
-        near_entites = entity.entities_within_euclidean_distance(1.9)
+        near_entites = entity.entities_within_euclidean_distance(2)
         near_entites = list(filter(lambda x: x.can_be_picked, near_entites))
 
         for pickup_entity in near_entites:
-            assert entity.location.is_adjacent(pickup_entity.location)
+            #assert entity.location.is_adjacent(pickup_entity.location)
             if entity.can_pickup(pickup_entity):
                 entity.queue_pickup(pickup_entity)
 
@@ -49,6 +84,7 @@ for state in game.turns():
         for direction in battlecode.Direction.directions():
             if entity.can_move(direction):
                 entity.queue_move(direction)
+'''
 
 end = time.clock()
 print('clock time: '+str(end - start))
