@@ -28,6 +28,8 @@ class Robot():
         self.loc = bot.location
         self.hp = bot.hp
         self.cooldown_time = 0
+        self.last_loc = None
+        self.loc_traveled =[]
 
         # role, defined by: (command, location to execute command)
         self.role = (None, None)
@@ -59,6 +61,13 @@ class Robot():
         x_dir = 0
         y_dir = 0
 
+        self.loc_traveled.append(self.loc)
+
+        temp_old_loc = self.loc
+
+        x = self.loc.x
+        y = self.loc.y
+
         if self.loc.x < loc[0]:
             x_dir = 1
         elif self.loc.x > loc[0]:
@@ -66,27 +75,43 @@ class Robot():
 
         if self.loc.y < loc[1]:
             y_dir = 1
+
         elif self.loc.x > loc[1]:
             y_dir = -1
 
         if x_dir != 0 or y_dir != 0:
-            direction = battlecode.Direction.from_delta(x_dir, y_dir)
-            print(direction, "x", x_dir, "y", y_dir)
-            print(self.cooldown_time)
-            # print(self.loc)
-            # print(direction, (x_dir, y_dir))
-
-            if self.bot.can_move(direction):
-                self.bot.queue_move(direction)
+            #direction = battlecode.Direction.from_delta(x_dir, y_dir)
+            #print(self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)))
+            if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
+                print("move1")
+            #try y direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(0, y_dir)) and (x, y +y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(0, y_dir))
+                print("move2")
+            #try x direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, 0)) and (x+x_dir, y) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, 0))
+                print("move3")
+            #try another direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, y_dir)) and (x-x_dir, y +y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, y_dir))
+                print("move4")
+            #try another direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -y_dir)) and (x+x_dir, y-y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, -y_dir))
+                print("move5")
+            #try y direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(0, -y_dir)) and (x, y-y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(0, -y_dir))
+                print("move6")
+            #try x direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, 0)) and (x-x_dir, y) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, 0))
+                print("move7")
             else:
-                no_move = False
-                for direction in battlecode.Direction.directions():
-                    if self.bot.can_move(direction):
-                        no_move = True
-                        self.bot.queue_move(direction)
-                if not no_move:
-                    # print("errrrr")
-                    pass
+                self.bot.can_move(battlecode.Direction.from_delta(-x_dir, -y_dir))
+
 
     def attack_loc(self, loc):
 
@@ -231,6 +256,9 @@ if __name__ == "__main__":
     important_locations = {}
 
     for state in game.turns():
+        entity_loc = []
+        for entity in state.get_entities():
+            entity_loc.append(entity.location)
 
         # check all robots exist, else add them into the dictionary our_bots
         for entity in state.get_entities(team=state.my_team):
