@@ -2,12 +2,6 @@ import battlecode
 import time
 import random
 
-#Start a game
-game = battlecode.Game('testplayer')
-
-start = time.clock()
-
-our_bots = {}
 
 #define helper functions here
 def nearest_glass_state(state, entity):
@@ -25,9 +19,9 @@ def nearest_glass_state(state, entity):
 
 class Robot():
 
-    def __init__(self, state, entity, bot):
-        self.state = state
-        self.entity = entity
+    def __init__(self, bot):
+        # self.state = state
+        # self.entity = entity
 
         # bot variables
         self.bot = bot
@@ -156,7 +150,6 @@ class Robot():
                 self.role = (None, None)
 
 
-
 def find_nearest_enemy(state, entity, location):
     '''
     finds the nearest enemy to a given location
@@ -208,51 +201,56 @@ def assign_roles(d, bot, role):
 
 
 
+if __name__ == "__main__":
+    # Start a game
+    game = battlecode.Game('testplayer')
+
+    start = time.clock()
+
+    our_bots = {}
 
 
-for state in game.turns():
-    # Your Code will run within this loop
-    for entity in state.get_entities(team=state.my_team):
-        # This line gets all the bots on your team
+    for state in game.turns():
 
-        '''
-        target all other robots
-        '''
+        # check all robots exist, else add them into the dictionary our_bots
+        for entity in state.get_entities(team=state.my_team):
+            if entity.id not in our_bots:
+                our_bots[entity.id] = Robot(entity)
 
 
+        # Your Code will run within this loop
+        for entity in state.get_entities(team=state.my_team):
+            # This line gets all the bots on your team
+
+            '''
+            target all other robots
+            '''
 
 
+            # if(state.turn % 10 == 0):
+            #     for direction in battlecode.Direction.directions():
+            #         if entity.can_build(direction):
+            #             entity.queue_build(direction)
+            #
+            # my_location = entity.location
+            # near_entites = entity.entities_within_euclidean_distance(1.9)
+            # near_entites = list(filter(lambda x: x.can_be_picked, near_entites))
+            #
+            # for pickup_entity in near_entites:
+            #     assert entity.location.is_adjacent(pickup_entity.location)
+            #     if entity.can_pickup(pickup_entity):
+            #         entity.queue_pickup(pickup_entity)
+            #
+            # statue = nearest_glass_state(state, entity)
+            # if(statue != None):
+            #     direction = entity.location.direction_to(statue.location)
+            #     if entity.can_throw(direction):
+            #         entity.queue_throw(direction)
+            #
+            # for direction in battlecode.Direction.directions():
+            #     if entity.can_move(direction):
+            #         entity.queue_move(direction)
 
-
-
-
-
-
-
-        # if(state.turn % 10 == 0):
-        #     for direction in battlecode.Direction.directions():
-        #         if entity.can_build(direction):
-        #             entity.queue_build(direction)
-        #
-        # my_location = entity.location
-        # near_entites = entity.entities_within_euclidean_distance(1.9)
-        # near_entites = list(filter(lambda x: x.can_be_picked, near_entites))
-        #
-        # for pickup_entity in near_entites:
-        #     assert entity.location.is_adjacent(pickup_entity.location)
-        #     if entity.can_pickup(pickup_entity):
-        #         entity.queue_pickup(pickup_entity)
-        #
-        # statue = nearest_glass_state(state, entity)
-        # if(statue != None):
-        #     direction = entity.location.direction_to(statue.location)
-        #     if entity.can_throw(direction):
-        #         entity.queue_throw(direction)
-        #
-        # for direction in battlecode.Direction.directions():
-        #     if entity.can_move(direction):
-        #         entity.queue_move(direction)
-
-end = time.clock()
-print('clock time: '+str(end - start))
-print('per round: '+str((end - start) / 1000))
+    end = time.clock()
+    print('clock time: ' + str(end - start))
+    print('per round: ' + str((end - start) / 1000))
