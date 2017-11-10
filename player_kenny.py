@@ -88,12 +88,34 @@ class Robot():
 
         else:
             # attack sequence, first need to get adjacent players
+            near_entities = self.bot.entities_within_euclidean_distance(1)
+            if len(near_entities) != 0:
+                # if there is an adjacent player, throw it, otherwise wait??
+                for entity in near_entities: # entity is entity to be thrown
 
+                    if self.bot.can_pickup(entity):
+                        # pickup the entity
+                        self.bot.queue_pickup(entity)
+                        # throw entity in direction of loc
+                        throw_dir = self.loc.direction_to(entity.location)
+                        self.bot.queue_throw(throw_dir)
+                        break
 
+            else:
+                # there are no nearby bots, wait for the follower bot to catch up?
+                pass
 
+    def build_loc(self, loc):
 
+        # check if bot is at builder loc
+        if abs(loc.x - self.loc.x) <= 1 and abs(loc.y - self.loc.y) <= 1:
+            # execute build sequence
+            build_dir = self.loc.direction_to(loc)
 
-            # if there is an adjacent player, throw it, otherwise wait??
+            # set
+
+            # build
+            self.bot.queue_build(build_dir)
 
 
 
