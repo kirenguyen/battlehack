@@ -61,9 +61,9 @@ class Robot():
         x_dir = 0
         y_dir = 0
 
-        #self.loc_traveled.append(self.loc)
+        self.loc_traveled.append(self.loc)
 
-        #temp_old_loc = self.loc
+        temp_old_loc = self.loc
 
         x = self.loc.x
         y = self.loc.y
@@ -243,7 +243,7 @@ def assign_roles(d, bot, role):
 
 if __name__ == "__main__":
     # Start a game
-    game = battlecode.Game('Hello World')
+    game = battlecode.Game('KIRE, NOT KENNY!!!')
 
     start = time.clock()
 
@@ -258,6 +258,10 @@ if __name__ == "__main__":
         for entity in state.get_entities(team=state.my_team):
             if entity.id not in our_bots:
                 our_bots[entity.id] = Robot(entity)
+            else:
+                our_bots[entity.id].update_bot(entity)
+
+        #TODO: location change
         for bot in our_bots.values():
             bot.go_to_loc((0,0))
 
