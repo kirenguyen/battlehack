@@ -33,18 +33,18 @@ class Robot():
         self.bot = bot
         self.loc = bot.location
         self.hp = bot.hp
-        self.cooldown_end = None
+        self.cooldown_time = 0
 
-        # role
-        self.role = None
+        # role, defined by: (command, location to execute command)
+        self.role = (None, None)
 
     def update_bot(self, bot):
         self.bot = bot
         self.loc = bot.location
         self.hp = bot.hp
 
-    def update_role(self, new_role):
-        self.role = new_role
+    def update_role(self, new_role, loc = None):
+        self.role = (new_role, loc)
 
     def return_loc(self):
         return self.loc
@@ -101,6 +101,9 @@ class Robot():
                         self.bot.queue_throw(throw_dir)
                         break
 
+                # at end of attack seq, set role to None, job is complete
+                self.role = None
+
             else:
                 # there are no nearby bots, wait for the follower bot to catch up?
                 pass
@@ -109,17 +112,48 @@ class Robot():
 
         # check if bot is at builder loc
         if abs(loc.x - self.loc.x) <= 1 and abs(loc.y - self.loc.y) <= 1:
+
+
             # execute build sequence
             build_dir = self.loc.direction_to(loc)
 
-            # set
+            # set cooldown_timer to 10
+            self.cooldown_time = 10
 
             # build
             self.bot.queue_build(build_dir)
 
+            # set state to coolingdown
+            self.role = ('cooldown', self.loc)
 
+        else:
+            self.go_to_loc(loc)
 
+    def brain(self):
+        '''
+        brain looks at the role that each robot is assigned to and ensures that that role
+        is executed properly
+        :return:
+        '''
 
+        # make sure that there is no cooldown time
+        if self.cooldown_time == 0:
+
+            if self.role[0] == 'attack':
+                self.attack_loc(self.role[1])
+
+            elif self.role[0] == 'build':
+                self.build_loc(self.role[1])
+
+            elif self.role[0] == 'follow':
+                self.go_to_loc(self.role[1])
+
+        else:
+            # subtract from cooldown time until it hits zero
+            self.cooldown_time -= 1
+
+            if self.cooldown_time == 0:
+                self.role = (None, None)
 
 
 
@@ -162,9 +196,6 @@ def assign_bots(state, entity, d):
 
     return d
 
-
-
-
 def assign_roles(d, bot, role):
     '''
     assigns a role to a robot, if robot not in role_fn, adds to role_fn
@@ -173,8 +204,7 @@ def assign_roles(d, bot, role):
     :param role:
     :return:
     '''
-    if bot in d:
-
+    pass
 
 
 
