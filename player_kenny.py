@@ -79,39 +79,44 @@ class Robot():
         elif self.loc.x > loc[1]:
             y_dir = -1
 
-        if x_dir != 0 or y_dir != 0:
+        if x_dir != 0 and y_dir != 0:
             #direction = battlecode.Direction.from_delta(x_dir, y_dir)
             #print(self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)))
             if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
-                print("move1")
             #try y direction
             elif self.bot.can_move(battlecode.Direction.from_delta(0, y_dir)) and (x, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(0, y_dir))
-                print("move2")
             #try x direction
             elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, 0)) and (x+x_dir, y) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, 0))
-                print("move3")
             #try another direction
             elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, y_dir)) and (x-x_dir, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, y_dir))
-                print("move4")
             #try another direction
             elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -y_dir)) and (x+x_dir, y-y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, -y_dir))
-                print("move5")
             #try y direction
             elif self.bot.can_move(battlecode.Direction.from_delta(0, -y_dir)) and (x, y-y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(0, -y_dir))
-                print("move6")
             #try x direction
             elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, 0)) and (x-x_dir, y) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, 0))
-                print("move7")
-            else:
-                self.bot.can_move(battlecode.Direction.from_delta(-x_dir, -y_dir))
+            # else:
+            #     self.bot.can_move(battlecode.Direction.from_delta(-x_dir, -y_dir))
+        elif x_dir == 0 and y_dir != 0:
+            if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
+            #try another direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -y_dir)) and (x-x_dir, y +y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, -y_dir))
 
+        elif x_dir != 0 and y_dir == 0:
+            if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
+            #try another direction
+            elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, y_dir)) and (x-x_dir, y +y_dir) not in self.loc_traveled:
+                self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, y_dir))
 
     def attack_loc(self, loc):
 
@@ -136,6 +141,7 @@ class Robot():
                         break
 
                 # at end of attack seq, set role to None, job is complete
+                print("REAWWWWR")
                 self.role = (None, None)
 
             else:
@@ -143,25 +149,32 @@ class Robot():
                 pass
 
     def build_loc(self, loc):
+        print(self.role)
+        if self.cooldown_time == 0:
+            # check if bot is at builder loc
+            # if abs(loc[0] - self.loc[0]) <= 1 and abs(loc[1] - self.loc[1]) <= 1:
+            print(self.loc[0], self.loc[1], "target:", (loc[0], loc[1]))
+            if self.loc.is_adjacent(loc):
 
-        # check if bot is at builder loc
-        if abs(loc.x - self.loc.x) <= 1 and abs(loc.y - self.loc.y) <= 1:
+                # execute build sequence
+                build_dir = self.loc.direction_to(loc)
 
+                # set cooldown_timer to 10
+                self.cooldown_time = 10
 
-            # execute build sequence
-            build_dir = self.loc.direction_to(loc)
+                # build
+                if self.bot.can_build(build_dir):
+                    self.bot.queue_build(build_dir)
 
-            # set cooldown_timer to 10
-            self.cooldown_time = 10
+                # set state to coolingdown
+                self.role = ('cooldown', self.loc)
+                print(self.role)
 
-            # build
-            self.bot.queue_build(build_dir)
+                print("already built")
 
-            # set state to coolingdown
-            self.role = ('cooldown', self.loc)
+            else:
+                self.go_to_loc(loc)
 
-        else:
-            self.go_to_loc(loc)
 
     def brain(self):
         '''
@@ -188,10 +201,12 @@ class Robot():
 
         else:
             # subtract from cooldown time until it hits zero
-            self.cooldown_time -= 1
-
-            if self.cooldown_time == 0:
+            if self.cooldown_time > 0:
+                self.cooldown_time -= 1
+                print(self.cooldown_time)
+            else:
                 self.role = (None, None)
+
 
 
 def find_nearest_enemy(state, entity, location):
@@ -253,6 +268,7 @@ if __name__ == "__main__":
     start = time.clock()
 
     our_bots = {}
+
     important_locations = {}
 
     for state in game.turns():
@@ -261,8 +277,8 @@ if __name__ == "__main__":
             entity_loc.append(entity.location)
 
         # check all robots exist, else add them into the dictionary our_bots
-        for entity in state.get_entities(team=state.my_team):
-            if entity.id not in our_bots:
+        for entity in state.get_entities(entity_type='thrower',team=state.my_team):
+            if entity.id not in our_bots: #and entity.is_thrower:
                 our_bots[entity.id] = Robot(entity)
             else:
                 our_bots[entity.id].update_bot(entity)
@@ -275,14 +291,20 @@ if __name__ == "__main__":
 
 
         # Your Code will run within this loop
-        for entity in state.get_entities(team=state.my_team):
+        for entity in state.get_entities(entity_type='thrower', team=state.my_team):
             # This line gets all the bots on your team
 
             robot_class = our_bots[entity.id]
 
-            if robot_class.return_role()[0] == None:
+            if our_bots[entity.id].return_role()[0] == None:
+                print("henloooo")
 
-                robot_class.update_role('attack', statue_list[0].location)
+                target = battlecode.Location(10, 10)
+                if our_bots[entity.id].cooldown_time == 0:
+                    our_bots[entity.id].update_role('build', target)
+                    # our_bots[entity.id].cooldown_time = 10
+
+
 
             robot_class.brain()
 
