@@ -308,6 +308,8 @@ def analyze_map(state, num_buildings, num_attacks):
     dictionary = {"build_on":desired_buildings, "attack":ordered_tower_locations}
     return(dictionary)
 
+
+
 if __name__ == "__main__":
     # Start a game
     game = battlecode.Game('unicorn')
