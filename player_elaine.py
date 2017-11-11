@@ -361,7 +361,7 @@ if __name__ == "__main__":
             robot_class = our_bots[entity.id]
             mode = ['build', 'attack']
 
-            nearby_entities = [x for x in state.get_entities(team=state.my_team)]
+            nearby_entities = [x for x in state.entities_within_adjacent_distance()]
             if len(nearby_entities) > 4:
                 entity.queue_disintegrate()
 
