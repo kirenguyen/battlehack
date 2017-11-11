@@ -148,15 +148,23 @@ class Robot():
             if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir)!= self.last_loc:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
             #try another direction
-            elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -y_dir)) and (x-x_dir, y +y_dir) != self.last_loc:
+            elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -y_dir)) and (x-x_dir, y-y_dir) != self.last_loc:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, -y_dir))
+            elif self.bot.can_move(battlecode.Direction.from_delta(-1, y_dir)) and (x-1, y+y_dir) != self.last_loc:
+                self.bot.queue_move(battlecode.Direction.from_delta(-1, y_dir))
+            elif self.bot.can_move(battlecode.Direction.from_delta(1, y_dir)) and (x+1, y+y_dir) != self.last_loc:
+                self.bot.queue_move(battlecode.Direction.from_delta(1, y_dir))
 
         elif x_dir != 0 and y_dir == 0:
             if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir) != self.last_loc:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
             #try another direction
-            elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, y_dir)) and (x-x_dir, y +y_dir) != self.last_loc:
+            elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, y_dir)) and (x-x_dir, y+y_dir) != self.last_loc:
                 self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, y_dir))
+            elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, 1)) and (x+x_dir, y+1) != self.last_loc:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, 1))
+            elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -1)) and (x+x_dir, y-1) != self.last_loc:
+                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, -1))
 
         self.last_loc = temp_old_loc
 
@@ -314,9 +322,18 @@ if __name__ == "__main__":
     important_locations = {}
 
     for state in game.turns():
+
+        hedges_loc = []
         max_x = state.map.width
         max_y = state.map.height
+
         entity_loc = {}
+
+        for entity in state.get_entities(team=0):
+            if entity.is_hedge:
+                hedges_loc.append(entity.location)
+
+
         for entity in state.get_entities():
             if entity.location not in entity_loc.keys():
                 entity_loc[entity.location] = [entity]
@@ -345,11 +362,12 @@ if __name__ == "__main__":
 
             if our_bots[entity.id].return_role()[0] == None:
                 print("henloooo")
-
-                target = battlecode.Location(random.randrange(1,max_x), random.randrange(1,max_y))
-                if our_bots[entity.id].cooldown_time == 0:
-                    our_bots[entity.id].update_role('build', target)
-                    # our_bots[entity.id].cooldown_time = 10
+                target_coord = (random.randrange(1,max_x-1), random.randrange(1,max_y-1))
+                if target_coord not in hedges_loc and target_coord != our_bots[entity.id].loc:
+                    target = battlecode.Location(random.randrange(1,max_x), random.randrange(1,max_y))
+                    if our_bots[entity.id].cooldown_time == 0:
+                        our_bots[entity.id].update_role('build', target)
+                        # our_bots[entity.id].cooldown_time = 10
 
 
 
