@@ -340,7 +340,7 @@ if __name__ == "__main__":
                 our_bots[entity.id].update_bot(entity)
             if entity.id < lowest_id:
                 lowest_id = entity.id
-        first_robot = entity.id(lowest_id)
+        first_robot = our_bots[lowest_id]
         first_location = first_robot.location
 
         # identify locations of towers
