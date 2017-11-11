@@ -23,7 +23,7 @@ def categorize_entities(state):
     my_lob = []
     my_glass = []
     opp_lob = []
-    opp_glass = []
+    opp_glass = {}
     for entity in state.get_entities(team=state.my_team):
         if entity.is_statue:
             my_glass.append(entity)
@@ -36,7 +36,7 @@ def categorize_entities(state):
 
     for entity in state.get_entities(team=state.other_team):
         if entity.is_statue:
-            opp_glass.append(entity)
+            opp_glass[entity.location] = entity
         if entity.is_thrower:
             opp_lob.append(entity)
     return [hedges_loc, my_lob, my_glass, opp_lob, opp_glass]
@@ -186,7 +186,7 @@ class Robot():
                     self.bot.queue_pickup(pickup_entity)
             if (self.loc[0], self.loc[1]) != (loc[0], loc[1]):
                 direction = entity.location.direction_to(loc)
-                
+
             if self.bot.can_throw(direction):
                 self.bot.queue_throw(direction)
 
@@ -319,8 +319,10 @@ if __name__ == "__main__":
     for state in game.turns():
 
         hedges_loc = []
+        enemy_glass = []
 
         list_of_items = categorize_entities(state)
+        enemy_glass = list_of_items[4].keys()
 
         max_x = state.map.width
         max_y = state.map.height
@@ -366,10 +368,12 @@ if __name__ == "__main__":
                 target_coord = (target_x, target_y)
                 if (target_coord not in hedges_loc) and (target_coord != our_bots[entity.id].loc):
                     target = battlecode.Location(target_coord)
+
                     if our_bots[entity.id].cooldown_time == 0:
-                        mode_index = random.randrange(0,2)
-                        print(mode[mode_index])
-                        our_bots[entity.id].update_role(mode[mode_index], target)
+                        if target_coord in enemy_glass:
+                            our_bots[entity.id].update_role('attack', target)
+                        else:
+                            our_bots[entity.id].update_role('build', target)
                         # our_bots[entity.id].cooldown_time = 10
 
 
