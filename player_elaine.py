@@ -367,8 +367,8 @@ if __name__ == "__main__":
 
             if our_bots[entity.id].return_role()[0] == None:
                 print("henloooo")
-                target_x = (random.randrange(1,max_x-1)) - (random.randrange(1,max_x-1))%5
-                target_y = (random.randrange(1,max_y-1)) - (random.randrange(1,max_y-1))%5
+                target_x = (random.randrange(1,max_x-1)) - (random.randrange(1,max_x-1))%3
+                target_y = (random.randrange(1,max_y-1)) - (random.randrange(1,max_y-1))%3
                 target_coord = (target_x, target_y)
                 if (target_coord not in hedges_loc) and (target_coord != our_bots[entity.id].loc):
                     target = battlecode.Location(target_coord)
@@ -377,7 +377,7 @@ if __name__ == "__main__":
                         if target_coord in enemy_glass:
                             our_bots[entity.id].update_role('attack', target)
                         else:
-                            our_bots[entity.id].update_role('build', target)
+                        our_bots[entity.id].update_role('build', target)
                         # our_bots[entity.id].cooldown_time = 10
 
 
