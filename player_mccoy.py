@@ -317,7 +317,7 @@ def analyze_map(state, num_buildings, num_attacks):
 
 if __name__ == "__main__":
     # Start a game
-    game = battlecode.Game('I GOT GREENS, BEANS, TOMATOES, POTATOES --- YOU NAME IT!')
+    game = battlecode.Game('unicorn')
 
     start = time.clock()
 
@@ -331,6 +331,7 @@ if __name__ == "__main__":
 
 
     for state in game.turns():
+
         # check all robots exist, else add them into the dictionary our_bots
         lowest_id = 32001
         for entity in state.get_entities(team=state.my_team):
@@ -340,7 +341,7 @@ if __name__ == "__main__":
                 our_bots[entity.id].update_bot(entity)
             if entity.id < lowest_id:
                 lowest_id = entity.id
-        first_robot = entity.id(lowest_id)
+        first_robot = our_bots[lowest_id]
         first_location = first_robot.location
 
         # identify locations of towers
