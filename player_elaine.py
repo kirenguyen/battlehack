@@ -40,20 +40,22 @@ def categorize_entities(state):
             opp_lob.append(entity)
     return [hedges_loc, my_lob, my_glass, opp_lob, opp_glass]
 
-def check_targets(state, bot):
-    bot.loc
+def check_targets(state, bot, entity_list):
+    #creates a list of lists that holds all the entities that are in throwing direction of bot
+    #an empty square is represented by None
     direction_change = [(-1,-1), (0,-1), (1,-1), (1,0), (1,1), (0,1), (-1,1), (-1,0)]
     targets = []
     for direction in direction_change:
         targ_list_dir = []
-        if direction[0] ==0 or direction[1] == 0:
-            for i in range(1,8):
-                targ_list_dir.append((bot.loc.x+direction[0], bot.loc.y+direction[1]))
-        else:
-            for i in range(1,6):
-                targ_list_dir.append((bot.loc.x + direction[0], bot.loc.y + direction[1]))
+        #creates a list of all the objects within 7 sqares in the given direction
+        for i in range(1,8):
+            location = (bot.loc.x+direction[0]*i, bot.loc.y+direction[1]*i)
+            if location is in entity_list.keys:
+                targ_list_dir.append(entity_list[location][0])
+            else:
+                targ_list_dir.append(None)
         targets.append(targ_list_dir)
-
+    return targets
 
 class Robot():
 
@@ -310,9 +312,12 @@ if __name__ == "__main__":
     important_locations = {}
 
     for state in game.turns():
-        entity_loc = []
+        entity_loc = {}
         for entity in state.get_entities():
-            entity_loc.append(entity.location)
+            if entity.location not in entity_loc.keys():
+                entity_loc[entity.location] = [entity]
+            else:
+                entity_loc[entity.location].append(entity)
 
         # check all robots exist, else add them into the dictionary our_bots
         for entity in state.get_entities(entity_type='thrower',team=state.my_team):
