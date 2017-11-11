@@ -322,7 +322,7 @@ if __name__ == "__main__":
         enemy_glass = []
 
         list_of_items = categorize_entities(state)
-        enemy_glass = list_of_items[4].keys()
+        enemy_glass = list(list_of_items[4].keys()) + list_of_items[3]
 
         max_x = state.map.width
         max_y = state.map.height
@@ -360,6 +360,10 @@ if __name__ == "__main__":
 
             robot_class = our_bots[entity.id]
             mode = ['build', 'attack']
+
+            nearby_entities = [x for x in state.get_entities(team=state.my_team)]
+            if len(nearby_entities) > 4:
+                entity.queue_disintegrate()
 
             if our_bots[entity.id].return_role()[0] == None:
                 print("henloooo")
