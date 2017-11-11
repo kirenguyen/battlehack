@@ -1,6 +1,7 @@
 import battlecode
 import time
 import random
+import math
 
 
 #define helper functions here
@@ -171,32 +172,24 @@ class Robot():
     def attack_loc(self, loc):
 
         # calculate distance from self to target location
-        if self.calc_distance(loc) >= 7:
+        if self.calc_distance(loc) >= 4:
             # if it is > 7, move closer, otherwise, begin attack sequence
             self.go_to_loc(loc)
 
         else:
-            # attack sequence, first need to get adjacent players
-            near_entities = [x for x in self.bot.entities_within_euclidean_distance(1)]
-            if len(near_entities) != 0:
-                # if there is an adjacent player, throw it, otherwise wait??
-                for entity in near_entities: # entity is entity to be thrown
+            near_entites = self.bot.entities_within_euclidean_distance(1.9)
+            near_entites = list(filter(lambda x: x.can_be_picked, near_entites))
 
-                    if self.bot.can_pickup(entity):
-                        # pickup the entity
-                        self.bot.queue_pickup(entity)
-                        # throw entity in direction of loc
-                        throw_dir = self.loc.direction_to(loc)
-                        self.bot.queue_throw(throw_dir)
-                        break
+            for pickup_entity in near_entites:
+                assert self.bot.location.is_adjacent(pickup_entity.location)
+                if self.bot.can_pickup(pickup_entity):
+                    self.bot.queue_pickup(pickup_entity)
 
-                # at end of attack seq, set role to None, job is complete
-                print("REAWWWWR")
-                self.role = (None, None)
+            direction = entity.location.direction_to(loc)
+            if self.bot.can_throw(direction):
+                self.bot.queue_throw(direction)
 
-            else:
-                # there are no nearby bots, wait for the follower bot to catch up?
-                pass
+        self.role = (None, None)
 
     def build_loc(self, loc):
         print(self.role)
@@ -204,9 +197,10 @@ class Robot():
             # check if bot is at builder loc
             # if abs(loc[0] - self.loc[0]) <= 1 and abs(loc[1] - self.loc[1]) <= 1:
             print(self.loc[0], self.loc[1], "target:", (loc[0], loc[1]))
-            if self.loc.is_adjacent(loc):
+            if self.loc.is_adjacent(loc) and (self.loc[0], self.loc[1] != (loc[0], loc[1])):
 
                 # execute build sequence
+
                 build_dir = self.loc.direction_to(loc)
 
                 # set cooldown_timer to 10
@@ -359,14 +353,19 @@ if __name__ == "__main__":
             # This line gets all the bots on your team
 
             robot_class = our_bots[entity.id]
+            mode = ['build', 'attack']
 
             if our_bots[entity.id].return_role()[0] == None:
                 print("henloooo")
-                target_coord = (random.randrange(1,max_x-1), random.randrange(1,max_y-1))
-                if target_coord not in hedges_loc and target_coord != our_bots[entity.id].loc:
+                target_x = (random.randrange(1,max_x-1)) - (random.randrange(1,max_x-1))%5
+                target_y = (random.randrange(1,max_y-1)) - (random.randrange(1,max_y-1))%5
+                target_coord = (target_x, target_y)
+                if (target_coord not in hedges_loc) and (target_coord != our_bots[entity.id].loc):
                     target = battlecode.Location(target_coord)
                     if our_bots[entity.id].cooldown_time == 0:
-                        our_bots[entity.id].update_role('build', target)
+                        mode_index = random.randrange(0,2)
+                        print(mode[mode_index])
+                        our_bots[entity.id].update_role(mode[mode_index], target)
                         # our_bots[entity.id].cooldown_time = 10
 
 
