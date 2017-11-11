@@ -324,13 +324,13 @@ if __name__ == "__main__":
     our_bots = {}
     important_locations = {}
 
+
     for state in game.turns():
+        
+
         entity_loc = []
         for entity in state.get_entities():
             entity_loc.append(entity.location)
-
-
-    for state in game.turns():
 
         # check all robots exist, else add them into the dictionary our_bots
         lowest_id = 32001
