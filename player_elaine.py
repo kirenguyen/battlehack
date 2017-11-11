@@ -364,7 +364,7 @@ if __name__ == "__main__":
                 print("henloooo")
                 target_coord = (random.randrange(1,max_x-1), random.randrange(1,max_y-1))
                 if target_coord not in hedges_loc and target_coord != our_bots[entity.id].loc:
-                    target = battlecode.Location(random.randrange(1,max_x), random.randrange(1,max_y))
+                    target = battlecode.Location(target_coord)
                     if our_bots[entity.id].cooldown_time == 0:
                         our_bots[entity.id].update_role('build', target)
                         # our_bots[entity.id].cooldown_time = 10
