@@ -320,7 +320,6 @@ if __name__ == "__main__":
 
     for state in game.turns():
 
-
         entity_loc = []
         for entity in state.get_entities():
             entity_loc.append(entity.location)
