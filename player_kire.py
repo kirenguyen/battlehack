@@ -84,31 +84,24 @@ class Robot():
             #print(self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)))
             if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
-                print("move1")
             #try y direction
             elif self.bot.can_move(battlecode.Direction.from_delta(0, y_dir)) and (x, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(0, y_dir))
-                print("move2")
             #try x direction
             elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, 0)) and (x+x_dir, y) not in self.loc_traveled:
-                self.bot.queue_move(battlecode.Direction.from_delta(x_dir, 0))
-                print("move3")
+                self.bot.queue_move(battlecode.Direction.from_delta(int(x_dir), 0))
             #try another direction
             elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, y_dir)) and (x-x_dir, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, y_dir))
-                print("move4")
             #try another direction
             elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -y_dir)) and (x+x_dir, y-y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, -y_dir))
-                print("move5")
             #try y direction
             elif self.bot.can_move(battlecode.Direction.from_delta(0, -y_dir)) and (x, y-y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(0, -y_dir))
-                print("move6")
             #try x direction
             elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, 0)) and (x-x_dir, y) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, 0))
-                print("move7")
             else:
                 self.bot.can_move(battlecode.Direction.from_delta(-x_dir, -y_dir))
 
@@ -264,7 +257,6 @@ if __name__ == "__main__":
         #TODO: location change
         for bot in our_bots.values():
             bot.go_to_loc((0,0))
-
         # Your Code will run within this loop
         for entity in state.get_entities(team=state.my_team):
             # This line gets all the bots on your team
