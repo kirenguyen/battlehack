@@ -50,7 +50,7 @@ def check_targets(state, bot, entity_list):
         #creates a list of all the objects within 7 sqares in the given direction
         for i in range(1,8):
             location = (bot.loc.x+direction[0]*i, bot.loc.y+direction[1]*i)
-            if location is in entity_list.keys:
+            if location in entity_list.keys:
                 targ_list_dir.append(entity_list[location][0])
             else:
                 targ_list_dir.append(None)
