@@ -84,33 +84,26 @@ class Robot():
             #print(self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)))
             if self.bot.can_move(battlecode.Direction.from_delta(x_dir, y_dir)) and (x+x_dir, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, y_dir))
-                print("move1")
             #try y direction
             elif self.bot.can_move(battlecode.Direction.from_delta(0, y_dir)) and (x, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(0, y_dir))
-                print("move2")
             #try x direction
             elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, 0)) and (x+x_dir, y) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, 0))
-                print("move3")
             #try another direction
             elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, y_dir)) and (x-x_dir, y +y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, y_dir))
-                print("move4")
             #try another direction
             elif self.bot.can_move(battlecode.Direction.from_delta(x_dir, -y_dir)) and (x+x_dir, y-y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(x_dir, -y_dir))
-                print("move5")
             #try y direction
             elif self.bot.can_move(battlecode.Direction.from_delta(0, -y_dir)) and (x, y-y_dir) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(0, -y_dir))
-                print("move6")
             #try x direction
             elif self.bot.can_move(battlecode.Direction.from_delta(-x_dir, 0)) and (x-x_dir, y) not in self.loc_traveled:
                 self.bot.queue_move(battlecode.Direction.from_delta(-x_dir, 0))
-                print("move7")
-            else:
-                self.bot.can_move(battlecode.Direction.from_delta(-x_dir, -y_dir))
+            # else:
+            #     self.bot.can_move(battlecode.Direction.from_delta(-x_dir, -y_dir))
 
 
     def attack_loc(self, loc):
@@ -319,20 +312,21 @@ def analyze_map(state, num_buildings, num_attacks):
 
 if __name__ == "__main__":
     # Start a game
-    game = battlecode.Game('I GOT GREENS, BEANS, TOMATOES, POTATOES --- YOU NAME IT!')
+    game = battlecode.Game('unicorn')
 
     start = time.clock()
 
     our_bots = {}
     important_locations = {}
 
+
     for state in game.turns():
+
+
         entity_loc = []
         for entity in state.get_entities():
             entity_loc.append(entity.location)
 
-
-    for state in game.turns():
         # check all robots exist, else add them into the dictionary our_bots
         lowest_id = 32001
         for entity in state.get_entities(team=state.my_team):
@@ -342,8 +336,8 @@ if __name__ == "__main__":
                 our_bots[entity.id].update_bot(entity)
             if entity.id < lowest_id:
                 lowest_id = entity.id
-        first_robot = entity.id(lowest_id)
-        first_location = first_robot.location
+        first_robot = our_bots[lowest_id]
+        first_location = first_robot.loc
 
         # identify locations of towers
         statue_list = []
