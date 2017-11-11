@@ -184,8 +184,9 @@ class Robot():
                 assert self.bot.location.is_adjacent(pickup_entity.location)
                 if self.bot.can_pickup(pickup_entity):
                     self.bot.queue_pickup(pickup_entity)
-
-            direction = entity.location.direction_to(loc)
+            if (self.loc[0], self.loc[1]) != (loc[0], loc[1]):
+                direction = entity.location.direction_to(loc)
+                
             if self.bot.can_throw(direction):
                 self.bot.queue_throw(direction)
 
@@ -197,11 +198,11 @@ class Robot():
             # check if bot is at builder loc
             # if abs(loc[0] - self.loc[0]) <= 1 and abs(loc[1] - self.loc[1]) <= 1:
             print(self.loc[0], self.loc[1], "target:", (loc[0], loc[1]))
-            if self.loc.is_adjacent(loc) and (self.loc[0], self.loc[1] != (loc[0], loc[1])):
+            if self.loc.is_adjacent(loc) and ((self.loc[0], self.loc[1]) != (loc[0], loc[1])):
 
                 # execute build sequence
-
-                build_dir = self.loc.direction_to(loc)
+                if (self.loc[0], self.loc[1]) != (loc[0], loc[1]):
+                    build_dir = self.loc.direction_to(loc)
 
                 # set cooldown_timer to 10
                 self.cooldown_time = 10
@@ -318,6 +319,9 @@ if __name__ == "__main__":
     for state in game.turns():
 
         hedges_loc = []
+
+        list_of_items = categorize_entities(state)
+
         max_x = state.map.width
         max_y = state.map.height
 
