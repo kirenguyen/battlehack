@@ -3,7 +3,7 @@ import time
 import random
 
 #Start a game
-game = battlecode.Game('testplayer')
+game = battlecode.Game('the loser')
 
 start = time.clock()
 
@@ -26,7 +26,7 @@ for state in game.turns():
     for entity in state.get_entities(team=state.my_team): 
         # This line gets all the bots on your team
 
-        if(state.turn % 100 == 0):
+        if(state.turn % 10 == 0):
             for direction in battlecode.Direction.directions():
                 if entity.can_build(direction):
                     entity.queue_build(direction)
